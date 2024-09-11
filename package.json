@@ -1,0 +1,23 @@
+{
+    "name": "logh",
+    "version": "1.0.0",
+    "description": "logh",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/SynthesisLabs/logh.git"
+    },
+    "keywords": [
+      "logh"
+    ],
+    "author": "SynthesisLabs",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/SynthesisLabs/logh/issues"
+    },
+    "homepage": "https://github.com/SynthesisLabs/logh#readme"
+  }
+  

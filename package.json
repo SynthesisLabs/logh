@@ -4,20 +4,23 @@
     "description": "logh",
     "main": "index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/SynthesisLabs/logh.git"
+        "type": "git",
+        "url": "git+https://github.com/SynthesisLabs/logh.git"
     },
     "keywords": [
-      "logh"
+        "logh"
     ],
     "author": "SynthesisLabs",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/SynthesisLabs/logh/issues"
+        "url": "https://github.com/SynthesisLabs/logh/issues"
     },
-    "homepage": "https://github.com/SynthesisLabs/logh#readme"
-  }
-  
+    "homepage": "https://github.com/SynthesisLabs/logh#readme",
+    "dependencies": {
+        "discord.js": "^14.16.1",
+        "dotenv": "^16.4.5"
+    }
+}

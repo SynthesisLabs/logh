@@ -2,7 +2,7 @@
     "name": "logh",
     "version": "1.0.0",
     "description": "logh",
-    "main": "index.js",
+    "main": "bot/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },

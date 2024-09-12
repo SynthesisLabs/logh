@@ -12,7 +12,6 @@ client.once('ready', () => {
 
 // We will see if someone updated their presence
 client.on("presenceUpdate", (oldUser, newUser) => {
-
     // Making a variable named status
     let status;
 

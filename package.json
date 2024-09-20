@@ -2,7 +2,7 @@
     "name": "logh",
     "version": "1.0.0",
     "description": "logh",
-    "main": "bot/index.js",
+    "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -21,6 +21,8 @@
     "homepage": "https://github.com/SynthesisLabs/logh#readme",
     "dependencies": {
         "discord.js": "^14.16.1",
-        "dotenv": "^16.4.5"
+        "dotenv": "^16.4.5",
+        "ejs": "^3.1.10",
+        "express": "^4.21.0"
     }
 }

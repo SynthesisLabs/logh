@@ -3,8 +3,10 @@
     "version": "1.0.0",
     "description": "logh",
     "main": "index.js",
+    "type": "commonjs",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon index.js"
     },
     "repository": {
         "type": "git",
@@ -20,6 +22,7 @@
     },
     "homepage": "https://github.com/SynthesisLabs/logh#readme",
     "dependencies": {
+        "canvas": "^2.11.2",
         "discord.js": "^14.16.1",
         "dotenv": "^16.4.5",
         "ejs": "^3.1.10",

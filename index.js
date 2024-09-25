@@ -1,25 +1,21 @@
 // Importing the dependencies
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const createImage = require("./image.js")
 
 // Making the client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences] });
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
+    partials: [Partials.User, Partials.GuildMember, Partials.Presence],
+});
 
 // The bot will send once a message in the console that it is ready to use
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-
-function isPlayingSpotify(presence) {
-    if (!presence || !presence.activities) return null;
-    return presence.activities.find(activity => activity.type === 2 && activity.name === 'Spotify');
-}
-
-// We will see if someone updated their presence
-client.on("presenceUpdate", (oldPresence, newPresence) => {
-    // Making a variable named status
-    if (!newPresence || !newPresence.user || !newPresence.activities) return;
+client.on('presenceUpdate', (oldPresence, newPresence) => {
+    if (!newPresence || newPresence.user.id !== process.env.USER_ID || !newPresence.activities) return;
 
     // Get the Spotify activities from both old and new presences
     const oldSpotifyActivity = isPlayingSpotify(oldPresence);
@@ -27,13 +23,31 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
 
     // Log when there's a new song playing (details property changes)
     if (newSpotifyActivity && (!oldSpotifyActivity || oldSpotifyActivity.details !== newSpotifyActivity.details)) {
+
+        // Get song start and end timestamps (in milliseconds)
+        const songStartTime = newSpotifyActivity.timestamps.start;
+        const songEndTime = newSpotifyActivity.timestamps.end;
+
+        // Calculate the total song duration (in seconds)
+        const songDuration = (songEndTime - songStartTime) / 1000;
+
+        // Calculate the current time in the song (in seconds)
+        const currentTime = (Date.now() - songStartTime) / 1000;
+        // console.log(newSpotifyActivity)
         console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
+        createImage(newSpotifyActivity.details, newSpotifyActivity.state, newSpotifyActivity.assets.largeText, `https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`, currentTime, songDuration)
     }
-})
+});
 
 // You login with your discord bot token
 client.login(process.env.DISCORD_TOKEN);
 
-
 // This will be for later purposes
-module.exports = client;
+module.exports = { client };
+
+
+
+function isPlayingSpotify(presence) {
+    if (!presence || !presence.activities) return null;
+    return presence.activities.find(activity => activity.type === 2 && activity.name === 'Spotify');
+}

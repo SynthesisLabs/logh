@@ -14,28 +14,30 @@ client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
+const lastSongMap = new Map();
+
 client.on('presenceUpdate', (oldPresence, newPresence) => {
     if (!newPresence || newPresence.user.id !== process.env.USER_ID || !newPresence.activities) return;
 
-    // Get the Spotify activities from both old and new presences
     const oldSpotifyActivity = isPlayingSpotify(oldPresence);
     const newSpotifyActivity = isPlayingSpotify(newPresence);
 
-    // Log when there's a new song playing (details property changes)
-    if (newSpotifyActivity && (!oldSpotifyActivity || oldSpotifyActivity.details !== newSpotifyActivity.details)) {
+    if (newSpotifyActivity) {
+        const userId = newPresence.user.id;
+        const currentSong = newSpotifyActivity.details;
+        const lastSong = lastSongMap.get(userId);
 
-        // Get song start and end timestamps (in milliseconds)
-        const songStartTime = newSpotifyActivity.timestamps.start;
-        const songEndTime = newSpotifyActivity.timestamps.end;
+        if (!lastSong || lastSong !== currentSong) {
+            lastSongMap.set(userId, currentSong);
 
-        // Calculate the total song duration (in seconds)
-        const songDuration = (songEndTime - songStartTime) / 1000;
+            const songStartTime = newSpotifyActivity.timestamps.start;
+            const songEndTime = newSpotifyActivity.timestamps.end;
+            const songDuration = (songEndTime - songStartTime) / 1000;
+            const currentTime = (Date.now() - songStartTime) / 1000;
 
-        // Calculate the current time in the song (in seconds)
-        const currentTime = (Date.now() - songStartTime) / 1000;
-        // console.log(newSpotifyActivity)
-        console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
-        createImage(newSpotifyActivity.details, newSpotifyActivity.state, newSpotifyActivity.assets.largeText, `https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`, currentTime, songDuration)
+            fs.writeFileSync(`./image-output-${user}.png`, asdahd);
+            console.log(`Image saved as image-output-${user}.png`);
+        }
     }
 });
 

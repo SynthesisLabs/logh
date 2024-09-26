@@ -1,7 +1,8 @@
 // Importing the dependencies
 require('dotenv').config();
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
-const createImage = require("./image.js")
+const { MusicCard } = require("./image.js")
+const fs = require('node:fs');
 
 // Making the client
 const client = new Client({
@@ -14,30 +15,38 @@ client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-const lastSongMap = new Map();
-
-client.on('presenceUpdate', (oldPresence, newPresence) => {
+client.on('presenceUpdate', async (oldPresence, newPresence) => {
     if (!newPresence || newPresence.user.id !== process.env.USER_ID || !newPresence.activities) return;
 
+    // Get the Spotify activities from both old and new presences
     const oldSpotifyActivity = isPlayingSpotify(oldPresence);
     const newSpotifyActivity = isPlayingSpotify(newPresence);
 
-    if (newSpotifyActivity) {
-        const userId = newPresence.user.id;
-        const currentSong = newSpotifyActivity.details;
-        const lastSong = lastSongMap.get(userId);
+    // Log when there's a new song playing (details property changes)
+    if (newSpotifyActivity && (!oldSpotifyActivity || oldSpotifyActivity.details !== newSpotifyActivity.details)) {
 
-        if (!lastSong || lastSong !== currentSong) {
-            lastSongMap.set(userId, currentSong);
+        // Get song start and end timestamps (in milliseconds)
+        const songStartTime = newSpotifyActivity.timestamps.start;
+        const songEndTime = newSpotifyActivity.timestamps.end;
 
-            const songStartTime = newSpotifyActivity.timestamps.start;
-            const songEndTime = newSpotifyActivity.timestamps.end;
-            const songDuration = (songEndTime - songStartTime) / 1000;
-            const currentTime = (Date.now() - songStartTime) / 1000;
+        // Calculate the total song duration (in seconds)
+        const songDuration = (songEndTime - songStartTime) / 1000;
 
-            fs.writeFileSync(`./image-output-${user}.png`, asdahd);
-            console.log(`Image saved as image-output-${user}.png`);
-        }
+        // Calculate the current time in the song (in seconds)
+        const currentTime = (Date.now() - songStartTime) / 1000;
+        // console.log(newSpotifyActivity)
+        console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
+        const mCard = await new MusicCard()
+            .setSong(newSpotifyActivity.details)
+            .setArtist(newSpotifyActivity.state)
+            .setAlbum(newSpotifyActivity.assets.largeText)
+            .setCover(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
+            .setTime(currentTime, songDuration)
+            .build()
+
+        fs.writeFileSync('./image-output.png', mCard);
+        console.log('Image saved as image-output.png');
+
     }
 });
 

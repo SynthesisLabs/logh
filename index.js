@@ -1,7 +1,8 @@
 // Importing the dependencies
 require('dotenv').config();
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
-const createImage = require("./image.js")
+const { MusicCard } = require("./image.js")
+const fs = require('node:fs');
 
 // Making the client
 const client = new Client({
@@ -14,7 +15,7 @@ client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('presenceUpdate', (oldPresence, newPresence) => {
+client.on('presenceUpdate', async (oldPresence, newPresence) => {
     if (!newPresence || newPresence.user.id !== process.env.USER_ID || !newPresence.activities) return;
 
     // Get the Spotify activities from both old and new presences
@@ -35,7 +36,17 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
         const currentTime = (Date.now() - songStartTime) / 1000;
         // console.log(newSpotifyActivity)
         console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
-        createImage(newSpotifyActivity.details, newSpotifyActivity.state, newSpotifyActivity.assets.largeText, `https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`, currentTime, songDuration)
+        const mCard = await new MusicCard()
+            .setSong(newSpotifyActivity.details)
+            .setArtist(newSpotifyActivity.state)
+            .setAlbum(newSpotifyActivity.assets.largeText)
+            .setCover(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
+            .setTime(currentTime, songDuration)
+            .build()
+
+        fs.writeFileSync('./image-output.png', mCard);
+        console.log('Image saved as image-output.png');
+
     }
 });
 

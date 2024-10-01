@@ -120,8 +120,8 @@ class MusicCard {
 
         // Draw start and end times at the ends of the progress bar
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(startTimeText, barX, barY + 40); // Start time on the left
-        ctx.fillText(endTimeText, barX + barWidth - ctx.measureText(endTimeText).width, barY + 40); // End time on the right
+        ctx.fillText(startTimeText, barX, barY + 45); // Start time on the left
+        ctx.fillText(endTimeText, barX + barWidth - ctx.measureText(endTimeText).width, barY + 45); // End time on the right
 
         // Load and draw the image from URL
         const image = await loadImage(this.cover); // Use the image URL passed as a parameter

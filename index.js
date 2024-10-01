@@ -33,7 +33,9 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
         const songDuration = (songEndTime - songStartTime) / 1000;
 
         // Calculate the current time in the song (in seconds)
-        const currentTime = (Date.now() - songStartTime) / 1000;
+        let currentTime = (Date.now() - songStartTime) / 1000;
+        if(currentTime < 0) currentTime = 0.00
+        console.log(currentTime)
         // console.log(newSpotifyActivity)
         console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
         const mCard = await new MusicCard()

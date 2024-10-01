@@ -1,7 +1,8 @@
 // Importing the dependencies
 require('dotenv').config();
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
-const { MusicCard } = require("./image.js")
+const { MusicCard } = require("./utils/image.js")
+const { ImageColorExtractor } = require('./utils/color.js')
 const fs = require('node:fs');
 
 // Making the client
@@ -37,6 +38,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
         if(currentTime < 0) currentTime = 0.00
         console.log(currentTime)
         // console.log(newSpotifyActivity)
+        const color = await new ImageColorExtractor().getColorFromImage(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
         console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
         const mCard = await new MusicCard()
             .setSong(newSpotifyActivity.details)
@@ -44,11 +46,10 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
             .setAlbum(newSpotifyActivity.assets.largeText)
             .setCover(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
             .setTime(currentTime, songDuration)
+            .setColor("solid", "#1c1c1c")
             .build()
 
         fs.writeFileSync('./image-output.png', mCard);
-        console.log('Image saved as image-output.png');
-
     }
 });
 

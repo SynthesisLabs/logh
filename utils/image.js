@@ -11,6 +11,8 @@ class MusicCard {
         this.cover = '';
         this.songStart = '';
         this.songDuration = '';
+        this.type = "solid";
+        this.color = ['#1c1c1c', '#1c1c1c'];
     }
 
     /**
@@ -66,6 +68,25 @@ class MusicCard {
     }
 
     /**
+     * Set background color
+     * First color top-right, second color bottom-left
+     * @param {"solid" | "gradient"} type Start time song
+     * @param {Array} color Song duration
+     * @returns {MusicCard}
+     */
+    setColor(type, [color]) {
+        switch (type) {
+            case "solid":
+                this.type = "solid"
+                this.color = [color[0], color][0];
+            case "gradient":
+                this.type = "gradient"
+                this.color = [color[0], color[1]]
+        }
+        return this;
+    }
+
+    /**
      * Creating the MusicCard
      */
     async build() {
@@ -75,8 +96,16 @@ class MusicCard {
         const ctx = canvas.getContext("2d")
 
         // Background
-        ctx.fillStyle = '#1c1c1c';
-        ctx.fillRect(0, 0, width, height);
+        if (this.type === "gradient") {
+            const gradient = ctx.createLinearGradient(width, 0, 0, height);
+            gradient.addColorStop(0, this.color[0]);
+            gradient.addColorStop(1, this.color[1]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+        } else {
+            ctx.fillStyle = this.color[0];
+            ctx.fillRect(0, 0, width, height);
+        }
 
         // Now Playing Text
         ctx.fillStyle = '#ffffff';

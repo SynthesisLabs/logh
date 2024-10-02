@@ -46,7 +46,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
             .setAlbum(newSpotifyActivity.assets.largeText)
             .setCover(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
             .setTime(currentTime, songDuration)
-            .setColor("solid", "#1c1c1c")
+            .setColor("gradient", color, "#1c1c1c", 0.75)
             .build()
 
         fs.writeFileSync('./image-output.png', mCard);
@@ -58,8 +58,6 @@ client.login(process.env.DISCORD_TOKEN);
 
 // This will be for later purposes
 module.exports = { client };
-
-
 
 function isPlayingSpotify(presence) {
     if (!presence || !presence.activities) return null;

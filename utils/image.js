@@ -11,8 +11,14 @@ class MusicCard {
         this.cover = '';
         this.songStart = '';
         this.songDuration = '';
-        this.type = "solid";
-        this.color = ['#1c1c1c', '#1c1c1c'];
+        this.color = {
+            type: "solid",
+            color: "#1c1c1c",
+            topColor: "#1c1c1c",
+            botColor: "#1c1c1c",
+            gradientSizeFactor: 0.5,
+            bar: "#3ec6f4"
+        };
     }
 
     /**
@@ -74,15 +80,23 @@ class MusicCard {
      * @param {Array} color Song duration
      * @returns {MusicCard}
      */
-    setColor(type, [color]) {
+    setColor(type, color1, color2, gradientSizeFactor) {
         switch (type) {
             case "solid":
-                this.type = "solid"
-                this.color = [color[0], color][0];
+                this.color.type = "solid";
+                this.color.color = color1;
+                return this;
             case "gradient":
-                this.type = "gradient"
-                this.color = [color[0], color[1]]
+                this.color.type = "gradient";
+                this.color.topColor = color1;
+                this.color.botColor = color2;
+                this.color.gradientSizeFactor = gradientSizeFactor;
+                return this;
         }
+    }
+
+    setBar(color) {
+        this.color.bar = color;
         return this;
     }
 
@@ -96,14 +110,14 @@ class MusicCard {
         const ctx = canvas.getContext("2d")
 
         // Background
-        if (this.type === "gradient") {
-            const gradient = ctx.createLinearGradient(width, 0, 0, height);
-            gradient.addColorStop(0, this.color[0]);
-            gradient.addColorStop(1, this.color[1]);
+        if (this.color.type == "gradient") {
+            const gradient = ctx.createLinearGradient(width * this.color.gradientSizeFactor, 0, 0, height * this.color.gradientSizeFactor);
+            gradient.addColorStop(0, `${this.color.topColor}`);
+            gradient.addColorStop(1, `${this.color.botColor}`);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
         } else {
-            ctx.fillStyle = this.color[0];
+            ctx.fillStyle = `${this.color.color}`;
             ctx.fillRect(0, 0, width, height);
         }
 
@@ -139,7 +153,7 @@ class MusicCard {
         ctx.fillRect(barX, barY, barWidth, barHeight);
 
         // Foreground (the filled part) of the progress bar (green)
-        ctx.fillStyle = '#3ec6f4';
+        ctx.fillStyle = `${this.color.bar}`;
         ctx.fillRect(barX, barY, barWidth * progressPercent, barHeight);
 
         // Timestamp

@@ -39,6 +39,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
         console.log(currentTime)
         // console.log(newSpotifyActivity)
         const color = await new ImageColorExtractor().getColorFromImage(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
+        const darkedColor = await darkenImageColorToHex(color)
         console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
         const mCard = await new MusicCard()
             .setSong(newSpotifyActivity.details)
@@ -47,6 +48,7 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
             .setCover(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
             .setTime(currentTime, songDuration)
             .setColor("gradient", color, "#1c1c1c", 0.75)
+            .setBar(darkedColor)
             .build()
 
         fs.writeFileSync('./image-output.png', mCard);
@@ -59,6 +61,47 @@ client.login(process.env.DISCORD_TOKEN);
 // This will be for later purposes
 module.exports = { client };
 
+function darkenRGBColor(color, factor = 0.8) {
+    const { r, g, b } = color;
+    
+    // Multiply each color channel by the darkening factor
+    const newR = Math.max(0, Math.min(255, r * factor));
+    const newG = Math.max(0, Math.min(255, g * factor));
+    const newB = Math.max(0, Math.min(255, b * factor));
+
+    return { r: Math.round(newR), g: Math.round(newG), b: Math.round(newB) };
+}
+
+// Convert RGB to Hex
+function rgbToHex(r, g, b) {
+    const toHex = (component) => component.toString(16).padStart(2, '0').toUpperCase();
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+// Parse the rgb() string to extract r, g, and b values
+function parseRGB(rgbString) {
+    const rgbValues = rgbString.match(/\d+/g); // Extract numbers from the rgb() string
+    return {
+        r: parseInt(rgbValues[0]),
+        g: parseInt(rgbValues[1]),
+        b: parseInt(rgbValues[2])
+    };
+}
+
+async function darkenImageColorToHex(rgbString) {
+
+    const originalColor = parseRGB(rgbString);  // Parse the rgb string to get an RGB object
+    console.log("Parsed RGB Color:", originalColor);
+
+    const darkenedColor = darkenRGBColor(originalColor, 0.8); // Darken the RGB color
+    console.log("Darkened Color (RGB):", darkenedColor);  // Output darkened RGB color
+
+    // Convert the darkened RGB color to Hex
+    const darkenedHexColor = rgbToHex(darkenedColor.r, darkenedColor.g, darkenedColor.b);
+    console.log("Darkened Color (Hex):", darkenedHexColor);  // Output darkened Hex color
+
+    return `${darkenedHexColor}`;
+}
 function isPlayingSpotify(presence) {
     if (!presence || !presence.activities) return null;
     return presence.activities.find(activity => activity.type === 2 && activity.name === 'Spotify');

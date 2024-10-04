@@ -127,7 +127,8 @@ class MusicCard {
         ctx.fillText(`Now Playing:`, 50, 100);
 
         // Song Name
-        ctx.font = 'bold 48px Arial';
+        // ctx.font = 'bold 48px Arial';
+        ctx.font = applyText(canvas, this.song);
         ctx.fillText(this.song, 50, 180);
 
         // Artist Name
@@ -181,12 +182,27 @@ class MusicCard {
             console.log(error)
         }
 
-
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
         }
+
+        function applyText(canvas, text) {
+            const context = canvas.getContext('2d');
+        
+            // Declare a base size of the font
+            let fontSize = 48;
+        
+            do {
+                // Assign the font to the context and decrement it so it can be measured again
+                context.font = `bold ${fontSize -= 10}px Arial`;
+                // Compare pixel width of the text to the canvas minus the approximate avatar size
+            } while (context.measureText(text).width > canvas.width - 300);
+        
+            // Return the result to use in the actual canvas
+            return context.font;
+        };
     }
 }
 

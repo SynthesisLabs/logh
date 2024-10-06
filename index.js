@@ -25,22 +25,14 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
 
     // Log when there's a new song playing (details property changes)
     if (newSpotifyActivity && (!oldSpotifyActivity || oldSpotifyActivity.details !== newSpotifyActivity.details)) {
-
-        // Get song start and end timestamps (in milliseconds)
         const songStartTime = newSpotifyActivity.timestamps.start;
         const songEndTime = newSpotifyActivity.timestamps.end;
-
-        // Calculate the total song duration (in seconds)
         const songDuration = (songEndTime - songStartTime) / 1000;
 
-        // Calculate the current time in the song (in seconds)
         let currentTime = (Date.now() - songStartTime) / 1000;
-        if(currentTime < 0) currentTime = 0.00
-        console.log(currentTime)
-        // console.log(newSpotifyActivity)
+        if (currentTime < 0) currentTime = 0.00
         const color = await new ImageColorExtractor().getColorFromImage(`https://i.scdn.co/image/${newSpotifyActivity.assets.largeImage.slice(8)}`)
         const darkedColor = await darkenImageColorToHex(color)
-        console.log(`Now playing on Spotify: ${newSpotifyActivity.details} by ${newSpotifyActivity.state}`);
         const mCard = await new MusicCard()
             .setSong(newSpotifyActivity.details)
             .setArtist(newSpotifyActivity.state)
@@ -50,8 +42,8 @@ client.on('presenceUpdate', async (oldPresence, newPresence) => {
             .setColor("gradient", color, "#1c1c1c", 0.75)
             .setBar(darkedColor)
             .build()
-
         fs.writeFileSync('./image-output.png', mCard);
+        console.log("Written card", newSpotifyActivity.state, `${Math.round(songDuration - currentTime)}s remaining`)
     }
 });
 
@@ -63,7 +55,7 @@ module.exports = { client };
 
 function darkenRGBColor(color, factor = 0.8) {
     const { r, g, b } = color;
-    
+
     // Multiply each color channel by the darkening factor
     const newR = Math.max(0, Math.min(255, r * factor));
     const newG = Math.max(0, Math.min(255, g * factor));
@@ -91,14 +83,14 @@ function parseRGB(rgbString) {
 async function darkenImageColorToHex(rgbString) {
 
     const originalColor = parseRGB(rgbString);  // Parse the rgb string to get an RGB object
-    console.log("Parsed RGB Color:", originalColor);
+    // console.log("Parsed RGB Color:", originalColor);
 
     const darkenedColor = darkenRGBColor(originalColor, 0.8); // Darken the RGB color
-    console.log("Darkened Color (RGB):", darkenedColor);  // Output darkened RGB color
+    // console.log("Darkened Color (RGB):", darkenedColor);  // Output darkened RGB color
 
     // Convert the darkened RGB color to Hex
     const darkenedHexColor = rgbToHex(darkenedColor.r, darkenedColor.g, darkenedColor.b);
-    console.log("Darkened Color (Hex):", darkenedHexColor);  // Output darkened Hex color
+    // console.log("Darkened Color (Hex):", darkenedHexColor);  // Output darkened Hex color
 
     return `${darkenedHexColor}`;
 }

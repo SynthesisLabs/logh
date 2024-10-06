@@ -1,4 +1,4 @@
-const { createCanvas, loadImage } = require('canvas');
+const { createCanvas, loadImage, registerFont  } = require('canvas');
 
 class MusicCard {
     /**
@@ -53,7 +53,7 @@ class MusicCard {
 
     /**
      * Set cover image
-     * @param {string||path} image Cover image
+     * @param {string} image Cover image
      * @returns {MusicCard}
      */
     setCover(image) {
@@ -76,8 +76,10 @@ class MusicCard {
     /**
      * Set background color
      * First color top-right, second color bottom-left
-     * @param {"solid" | "gradient"} type Start time song
-     * @param {Array} color Song duration
+     * @param {"solid" | "gradient"} type Type of background
+     * @param {RGB} color1 The color you want
+     * @param {RGB} color2 The color you want
+     * @param {Number} gradientSizeFactor How big you want the gradient to be
      * @returns {MusicCard}
      */
     setColor(type, color1, color2, gradientSizeFactor) {
@@ -95,6 +97,11 @@ class MusicCard {
         }
     }
 
+    /**
+     * 
+     * @param {RGB} color 
+     * @returns 
+     */
     setBar(color) {
         this.color.bar = color;
         return this;
@@ -106,8 +113,8 @@ class MusicCard {
     async build() {
         const width = 800;
         const height = 440;
-        const canvas = createCanvas(width, height)
-        const ctx = canvas.getContext("2d")
+        const canvas = createCanvas(width, height);
+        const ctx = canvas.getContext("2d");
 
         // Background
         if (this.color.type == "gradient") {
@@ -123,63 +130,54 @@ class MusicCard {
 
         // Now Playing Text
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px Arial';
-        ctx.fillText(`Now Playing:`, 50, 100);
+        ctx.font = '36px "Circular Std bold"';  // Using Circular Std font
+        ctx.fillText(`Now playing:`, 50, 100);
 
         // Song Name
-        // ctx.font = 'bold 48px Arial';
-        ctx.font = applyText(canvas, this.song);
+        ctx.font = applyText(canvas, this.song);  // Song name with Circular Std
         ctx.fillText(this.song, 50, 180);
 
         // Artist Name
-        ctx.font = 'italic 36px Arial';
+        ctx.font = '36px "Circular Std book italic"';  // Artist name with Circular Std
         ctx.fillText(`By ${this.artist}`, 50, 260);
 
-
         // Album Name
-        ctx.font = 'bold 28px Arial';
+        ctx.font = '28px "Circular Std bold"';  // Album name with Circular Std
         ctx.fillText(`Album: ${this.album}`, 50, 320);
 
         // Draw Progress Bar
-        const barWidth = 700; // Total width of the progress bar
-        const barHeight = 20;  // Height of the progress bar
-        const barX = 50;       // X position
-        const barY = 350;      // Y position
-
-        // Calculate the percentage of the song that has been played
+        const barWidth = 700;
+        const barHeight = 20;
+        const barX = 50;
+        const barY = 350;
         const progressPercent = this.songStart / this.songDuration;
 
-        // Background of the progress bar (gray)
+        // Background of the progress bar
         ctx.fillStyle = '#555';
         ctx.fillRect(barX, barY, barWidth, barHeight);
 
-        // Foreground (the filled part) of the progress bar (green)
+        // Foreground of the progress bar
         ctx.fillStyle = `${this.color.bar}`;
         ctx.fillRect(barX, barY, barWidth * progressPercent, barHeight);
 
         // Timestamp
-        ctx.font = 'bold 24px Arial';
-        const startTimeText = formatTime(this.songStart); // Current position
-        const endTimeText = formatTime(this.songDuration);  // Song duration
-
-        // Draw start and end times at the ends of the progress bar
+        ctx.font = 'bold 24px "Circular Std bold"';  // Timestamp with Circular Std
+        const startTimeText = formatTime(this.songStart);
+        const endTimeText = formatTime(this.songDuration);
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(startTimeText, barX, barY + 45); // Start time on the left
-        ctx.fillText(endTimeText, barX + barWidth - ctx.measureText(endTimeText).width, barY + 45); // End time on the right
+        ctx.fillText(startTimeText, barX, barY + 45);
+        ctx.fillText(endTimeText, barX + barWidth - ctx.measureText(endTimeText).width, barY + 45);
 
         // Load and draw the image from URL
-        const image = await loadImage(this.cover); // Use the image URL passed as a parameter
-        const imageWidth = 240; // Desired width for the image
-        const imageHeight = (image.height / image.width) * imageWidth; // Maintain aspect ratio
-
-        // Position the image in the top right corner
-        ctx.drawImage(image, width - imageWidth - 50, 50, imageWidth, imageHeight); // Top right corner with padding
+        const image = await loadImage(this.cover);
+        const imageWidth = 240;
+        const imageHeight = (image.height / image.width) * imageWidth;
+        ctx.drawImage(image, width - imageWidth - 50, 50, imageWidth, imageHeight);
 
         try {
-            // Save the image to file
             return await canvas.toBuffer('image/png');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
 
         function formatTime(seconds) {
@@ -187,7 +185,7 @@ class MusicCard {
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
         }
-
+        
         function applyText(canvas, text) {
             const context = canvas.getContext('2d');
         
@@ -196,7 +194,7 @@ class MusicCard {
         
             do {
                 // Assign the font to the context and decrement it so it can be measured again
-                context.font = `bold ${fontSize -= 10}px Arial`;
+                context.font = `${fontSize -= 10}px "Circular Std bold"`;
                 // Compare pixel width of the text to the canvas minus the approximate avatar size
             } while (context.measureText(text).width > canvas.width - 300);
         
